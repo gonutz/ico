@@ -24,15 +24,19 @@ func usage() {
 }
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	if len(os.Args) == 1 {
 		fmt.Fprintln(os.Stderr, "not enough arguments")
 		usage()
-		return
+		return 2
 	}
 	if len(os.Args) > 3 {
 		fmt.Fprintln(os.Stderr, "too many arguments")
 		usage()
-		return
+		return 2
 	}
 	in := os.Args[1]
 	var out string
@@ -46,20 +50,22 @@ func main() {
 	f, err := os.Open(in)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Cannot open input file:", err)
-		return
+		return 2
 	}
 	defer f.Close()
 
 	img, _, err := image.Decode(f)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Cannot read input image: ", err)
-		return
+		return 2
 	}
 
 	icon := ico.FromImage(img)
 	err = ioutil.WriteFile(out, icon, 0666)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Cannot write output file:", err)
-		return
+		return 2
 	}
+
+	return 0
 }
