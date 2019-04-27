@@ -45,7 +45,7 @@ func FromImage(img image.Image) []byte {
 
 func resizedImageData(img image.Image, size int) []byte {
 	if img.Bounds().Dx() != size || img.Bounds().Dy() != size {
-		img = resize.Resize(uint(size), uint(size), img, resize.Bilinear)
+		img = resize.Resize(uint(size), uint(size), img, resize.MitchellNetravali)
 	}
 	var buf bytes.Buffer
 	png.Encode(&buf, img)
