@@ -6,7 +6,7 @@ import (
 	"image"
 	"image/png"
 
-	"github.com/nfnt/resize"
+	"github.com/gonutz/resize"
 )
 
 func FromImage(img image.Image) []byte {
