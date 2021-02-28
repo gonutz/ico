@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	_ "golang.org/x/image/bmp"
+	_ "github.com/gonutz/bmp"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
