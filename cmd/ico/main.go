@@ -2,25 +2,25 @@ package main
 
 import (
 	"fmt"
-	"image"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
-	_ "github.com/gonutz/bmp"
+	"github.com/gonutz/ico"
+
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
 
-	"github.com/gonutz/ico"
+	_ "github.com/gonutz/bmp"
 )
 
 func usage() {
 	fmt.Println(`usage: ico IMAGE-FILE [OUTPUT-FILE]
-  provide an input image (BMP, JPEG, PNG or GIF)
-  optionally provide an output file (ICO)
-  if no output file is given the input path will be used with extension .ico`)
+
+    Converts the input image (BMP, JPEG, PNG or GIF) to an icon file (ICO).
+    Saves to the given output file name. If no output file name is given, saves
+    to the input file name with the extension changed to .ico.`)
 }
 
 func main() {
@@ -28,42 +28,28 @@ func main() {
 }
 
 func run() int {
-	if len(os.Args) == 1 {
-		fmt.Fprintln(os.Stderr, "not enough arguments")
+	args := os.Args[1:]
+	if !(1 <= len(args) && len(args) <= 2) {
+		fmt.Fprintln(os.Stderr, "wrong number of arguments")
 		usage()
 		return 2
 	}
-	if len(os.Args) > 3 {
-		fmt.Fprintln(os.Stderr, "too many arguments")
-		usage()
-		return 2
-	}
-	in := os.Args[1]
-	var out string
-	if len(os.Args) == 3 {
-		out = os.Args[2]
-	} else {
-		ext := filepath.Ext(in)
-		out = strings.TrimSuffix(in, ext) + ".ico"
+
+	input := args[0]
+	output := strings.TrimSuffix(input, filepath.Ext(input)) + ".ico"
+	if len(args) == 2 {
+		output = args[1]
 	}
 
-	f, err := os.Open(in)
+	icon, err := ico.FromFile(input)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Cannot open input file:", err)
-		return 2
-	}
-	defer f.Close()
-
-	img, _, err := image.Decode(f)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Cannot read input image: ", err)
+		fmt.Fprintln(os.Stderr, err)
 		return 2
 	}
 
-	icon := ico.FromImage(img)
-	err = ioutil.WriteFile(out, icon, 0666)
+	err = os.WriteFile(output, icon, 0666)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Cannot write output file:", err)
+		fmt.Fprintf(os.Stderr, "failed to write output file '%s': %v\n", output, err)
 		return 2
 	}
 
